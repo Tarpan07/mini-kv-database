@@ -1,0 +1,7 @@
+build/
+*.exe
+*.o
+*.out
+*.log
+data/database.db
+log/commands.log
