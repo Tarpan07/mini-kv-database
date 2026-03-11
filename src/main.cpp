@@ -5,6 +5,7 @@
 #include "../include/Database.h"
 #include "../include/WAL.h"
 #include "../include/Snapshot.h"
+#include "../include/CommandParser.h"
 
 using namespace std;
 
@@ -28,15 +29,22 @@ int main()
         if (line.find_first_not_of(' ') == string::npos)
             continue;
 
-        stringstream ss(line);
-        string command;
+        auto tokens = CommandParser::parse(line);
 
-        ss >> command;
+        if (tokens.empty())
+            continue;
+
+        string command = tokens[0];
 
         if (command == "SET")
         {
-            string key, value;
-            ss >> key >> value;
+            if (tokens.size() < 3)
+            {
+                cout << "Usage: SET key value\n";
+                continue;
+            }
+            string key = tokens[1];
+            string value = tokens[2];
 
             WAL::write(line);
             db.set(key, value);
@@ -46,16 +54,14 @@ int main()
 
         else if (command == "GET")
         {
-            string key;
-            ss >> key;
+            string key = tokens[1];
 
             cout << db.get(key) << endl;
         }
 
         else if (command == "DEL")
         {
-            string key;
-            ss >> key;
+            string key = tokens[1];
 
             WAL::write(line);
 

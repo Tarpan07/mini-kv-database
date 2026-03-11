@@ -37,5 +37,4 @@ void Snapshot::load(std::unordered_map<std::string,std::string> &db)
 
     file.close();
 
-    std::cout << "Database loaded.\n";
 }
