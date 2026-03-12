@@ -14,6 +14,7 @@ persistence, crash recovery, and command parsing.
 - O(1) average read/write operations
 - Command Line Interface (CLI)
 - CommandParser for structured command parsing
+- StorageEngine layer for command execution
 - Snapshot persistence
 - Write-Ahead Logging (WAL)
 - Crash recovery using snapshot + WAL replay
@@ -29,7 +30,7 @@ persistence, crash recovery, and command parsing.
 | GET key | Retrieve value for a key |
 | DEL key | Delete a key |
 | KEYS | List all keys in the database |
-| CLEAR | Remove all keys |
+| CLEAR | Remove all keys from memory |
 | SAVE | Save database snapshot |
 | LOAD | Load database snapshot |
 | EXIT | Exit database |
@@ -64,11 +65,11 @@ When executing:
 SET name Tarpan
 ```
 
-The system performs:
+The system performs the following steps:
 
-1. Command is written to WAL
-2. Database is updated in memory
-3. Snapshot can persist the state to disk
+1. The command is written to the WAL log
+2. The database is updated in memory
+3. A snapshot can later persist the state to disk
 
 ---
 
@@ -76,9 +77,11 @@ The system performs:
 
 When the database starts:
 
-1. Snapshot is loaded
+1. Snapshot is loaded from disk
 2. WAL log is replayed
 3. Database state is restored
+
+This ensures durability even if the system crashes.
 
 ---
 
@@ -89,7 +92,7 @@ User CLI
    ↓
 CommandParser
    ↓
-Command Execution (main.cpp)
+StorageEngine
    ↓
 Database (unordered_map)
    ↓
@@ -97,6 +100,26 @@ Persistence Layer
    ├── WAL Logger
    └── Snapshot System
 ```
+
+### Component Responsibilities
+
+**CLI (main.cpp)**  
+Handles user input and interaction.
+
+**CommandParser**  
+Tokenizes user commands into structured arguments.
+
+**StorageEngine**  
+Coordinates command execution and interacts with the database and persistence layer.
+
+**Database**  
+Stores key-value pairs in memory using `unordered_map`.
+
+**WAL (Write Ahead Log)**  
+Logs write operations before execution for crash recovery.
+
+**Snapshot System**  
+Periodically saves the entire database state to disk.
 
 ---
 
@@ -110,18 +133,20 @@ mini-kv-database
 │   ├── Database.cpp
 │   ├── Snapshot.cpp
 │   ├── WAL.cpp
-│   └── CommandParser.cpp
+│   ├── CommandParser.cpp
+│   └── StorageEngine.cpp
 │
 ├── include/
 │   ├── Database.h
 │   ├── Snapshot.h
 │   ├── WAL.h
-│   └── CommandParser.h
+│   ├── CommandParser.h
+│   └── StorageEngine.h
 │
 ├── data/
 │   └── database.db
 │
-├── log/
+├── logs/
 │   └── commands.log
 │
 ├── docs/
@@ -151,7 +176,6 @@ Run:
 
 Planned features:
 
-- StorageEngine layer
 - TTL (key expiration)
 - LRU eviction policy
 - Background snapshot thread
@@ -167,6 +191,7 @@ This project helps understand:
 
 - database internals
 - storage engine design
-- logging systems
 - persistence mechanisms
-- crash recovery
+- write-ahead logging
+- crash recovery systems
+- modular system architecture

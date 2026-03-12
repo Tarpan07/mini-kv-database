@@ -4,7 +4,7 @@
 
 void Snapshot::save(std::unordered_map<std::string,std::string> &db)
 {
-    std::ofstream file("../data/database.db");
+    std::ofstream file("data/database.db");
 
     for (auto &p : db)
     {
@@ -18,7 +18,7 @@ void Snapshot::save(std::unordered_map<std::string,std::string> &db)
 
 void Snapshot::load(std::unordered_map<std::string,std::string> &db)
 {
-    std::ifstream file("../data/database.db");
+    std::ifstream file("data/database.db");
 
     if (!file)
     {
@@ -26,7 +26,7 @@ void Snapshot::load(std::unordered_map<std::string,std::string> &db)
         return;
     }
 
-    db.clear();   // important
+    db.clear();
 
     std::string key, value;
 
@@ -36,5 +36,4 @@ void Snapshot::load(std::unordered_map<std::string,std::string> &db)
     }
 
     file.close();
-
 }

@@ -4,13 +4,13 @@
 
 void WAL::write(const std::string &command)
 {
-    std::ofstream log("../logs/commands.log", std::ios::app);
+    std::ofstream log("logs/commands.log", std::ios::app);
     log << command << std::endl;
 }
 
 void WAL::recover(Database &database)
 {
-    std::ifstream log("../logs/commands.log");
+    std::ifstream log("logs/commands.log");
 
     if (!log)
         return;
