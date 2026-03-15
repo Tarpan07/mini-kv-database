@@ -2,38 +2,39 @@
 
 A lightweight in-memory key-value database engine written in C++.
 
-This project explores the internal architecture of modern databases by implementing
-core components such as in-memory storage, Write-Ahead Logging (WAL), snapshot
-persistence, crash recovery, and command parsing.
+This project explores the internal architecture of modern databases by implementing core components such as in-memory storage, Write-Ahead Logging (WAL), snapshot persistence, crash recovery, TTL expiration, and command parsing.
 
 ---
 
 # Features
 
-- In-memory key-value storage using `unordered_map`
-- O(1) average read/write operations
-- Command Line Interface (CLI)
-- CommandParser for structured command parsing
-- StorageEngine layer for command execution
-- Snapshot persistence
-- Write-Ahead Logging (WAL)
-- Crash recovery using snapshot + WAL replay
-- Modular architecture
+* In-memory key-value storage using `unordered_map`
+* O(1) average read/write operations
+* Command Line Interface (CLI)
+* CommandParser for structured command parsing
+* StorageEngine layer for command execution
+* Snapshot persistence
+* Write-Ahead Logging (WAL)
+* Crash recovery using snapshot + WAL replay
+* TTL (key expiration)
+* Automatic snapshot system (command-based checkpoint)
+* Modular architecture
 
 ---
 
 # Supported Commands
 
-| Command | Description |
-|-------|-------------|
-| SET key value | Insert or update a key-value pair |
-| GET key | Retrieve value for a key |
-| DEL key | Delete a key |
-| KEYS | List all keys in the database |
-| CLEAR | Remove all keys from memory |
-| SAVE | Save database snapshot |
-| LOAD | Load database snapshot |
-| EXIT | Exit database |
+| Command                  | Description                       |
+| ------------------------ | --------------------------------- |
+| SET key value            | Insert or update a key-value pair |
+| SET key value EX seconds | Insert key with expiration time   |
+| GET key                  | Retrieve value for a key          |
+| DEL key                  | Delete a key                      |
+| KEYS                     | List all keys in the database     |
+| CLEAR                    | Remove all keys from memory       |
+| SAVE                     | Save database snapshot            |
+| LOAD                     | Load database snapshot            |
+| EXIT                     | Exit database                     |
 
 ---
 
@@ -46,8 +47,12 @@ OK
 >> GET name
 Tarpan
 
+>> SET session token EX 10
+OK
+
 >> KEYS
 name
+session
 
 >> SAVE
 Database saved and WAL cleared
@@ -85,6 +90,36 @@ This ensures durability even if the system crashes.
 
 ---
 
+## TTL (Time-To-Live)
+
+Keys can be stored with an expiration time.
+
+Example:
+
+```
+SET session token EX 5
+```
+
+This means the key will automatically expire after **5 seconds**.
+
+Expired keys are removed when accessed.
+
+---
+
+## Automatic Snapshot
+
+To avoid large WAL logs and ensure persistence, the system automatically creates snapshots after a fixed number of commands.
+
+Example behavior:
+
+```
+Every 5 commands → snapshot automatically saved
+```
+
+This works as a checkpoint mechanism similar to real database systems.
+
+---
+
 # Architecture
 
 ```
@@ -101,24 +136,26 @@ Persistence Layer
    └── Snapshot System
 ```
 
-### Component Responsibilities
+---
 
-**CLI (main.cpp)**  
+# Component Responsibilities
+
+CLI (main.cpp)
 Handles user input and interaction.
 
-**CommandParser**  
+CommandParser
 Tokenizes user commands into structured arguments.
 
-**StorageEngine**  
+StorageEngine
 Coordinates command execution and interacts with the database and persistence layer.
 
-**Database**  
+Database
 Stores key-value pairs in memory using `unordered_map`.
 
-**WAL (Write Ahead Log)**  
+WAL (Write Ahead Log)
 Logs write operations before execution for crash recovery.
 
-**Snapshot System**  
+Snapshot System
 Periodically saves the entire database state to disk.
 
 ---
@@ -176,12 +213,12 @@ Run:
 
 Planned features:
 
-- TTL (key expiration)
-- LRU eviction policy
-- Background snapshot thread
-- WAL compaction
-- Statistics commands
-- Performance improvements
+* LRU eviction policy
+* background snapshot thread
+* WAL compaction
+* statistics commands
+* performance improvements
+* concurrency support
 
 ---
 
@@ -189,9 +226,26 @@ Planned features:
 
 This project helps understand:
 
-- database internals
-- storage engine design
-- persistence mechanisms
-- write-ahead logging
-- crash recovery systems
-- modular system architecture
+* database internals
+* storage engine design
+* persistence mechanisms
+* write-ahead logging
+* crash recovery systems
+* TTL based expiration
+* modular system architecture
+
+---
+
+# Project Status
+
+Current implementation includes:
+
+* In-memory key-value database
+* WAL logging
+* Snapshot persistence
+* Crash recovery
+* TTL expiration
+* Automatic snapshot system
+* Modular architecture
+
+The system resembles a simplified Redis-style key-value database engine.
