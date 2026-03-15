@@ -29,6 +29,11 @@ void StorageEngine::execute(const vector<string> &tokens, const string &rawComma
 
         WAL::write(rawCommand);
         db.set(key, value);
+        if (tokens.size() == 5 && tokens[3] == "EX")
+    {
+        int seconds = stoi(tokens[4]);
+        db.setExpiry(key, seconds);
+    }
 
         cout << "OK\n";
     }

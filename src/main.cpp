@@ -8,6 +8,7 @@
 #include "../include/StorageEngine.h"
 using namespace std;
 
+
 int main()
 {
     Database db;
@@ -18,7 +19,7 @@ int main()
     StorageEngine engine(db);
 
     string line;
-
+    int commandCount = 0;
     cout << "Mini Database Started\n";
 
     while (true)
@@ -33,5 +34,12 @@ int main()
         auto tokens = CommandParser::parse(line);
 
         engine.execute(tokens, line);
+        commandCount++;
+
+        if (commandCount % 5 == 0)
+        {
+            Snapshot::save(db.getAll());
+            cout << "[Auto Snapshot Saved]\n";
+        }
     }
 }
