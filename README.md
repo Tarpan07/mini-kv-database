@@ -209,16 +209,12 @@ Run:
 
 ---
 
+
 # Future Improvements
 
-Planned features:
-
-* LRU eviction policy
-* background snapshot thread
-* WAL compaction
-* statistics commands
-* performance improvements
-* concurrency support
+- TTLManager module for centralized expiration handling
+- LRU eviction policy
+- background snapshot thread
 
 ---
 
