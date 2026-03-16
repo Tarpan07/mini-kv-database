@@ -35,6 +35,7 @@ int main()
 
         engine.execute(tokens, line);
         commandCount++;
+        db.cleanupExpiredKeys();
 
         if (commandCount % 5 == 0)
         {

@@ -16,5 +16,7 @@ public:
     void setExpiry(const std::string &key, int seconds);
     bool isExpired(const std::string &key);
 
+    void cleanupExpiredKeys();
+    
     std::unordered_map<std::string, std::string>& getAll();
 };

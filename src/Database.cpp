@@ -47,3 +47,20 @@ std::unordered_map<std::string, std::string>& Database::getAll()
 {
     return db;
 }
+void Database::cleanupExpiredKeys()
+{
+    time_t now = time(nullptr);
+
+    for(auto it = expiry.begin(); it != expiry.end(); )
+    {
+        if(now > it->second)
+        {
+            db.erase(it->first);
+            it = expiry.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
+}
