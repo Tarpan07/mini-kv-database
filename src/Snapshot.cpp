@@ -4,7 +4,7 @@
 
 void Snapshot::save(std::unordered_map<std::string,std::string> &db)
 {
-    std::ofstream file("data/database.db");
+    std::ofstream file("data/database.db");   // ✅ same path
 
     for (auto &p : db)
     {
@@ -16,14 +16,14 @@ void Snapshot::save(std::unordered_map<std::string,std::string> &db)
     std::cout << "Database saved.\n";
 }
 
-void Snapshot::load(std::unordered_map<std::string,std::string> &db)
+bool Snapshot::load(std::unordered_map<std::string,std::string> &db)
 {
-    std::ifstream file("data/database.db");
+    std::ifstream file("data/database.db");   // ✅ FIXED
 
     if (!file)
     {
         std::cout << "No database file found.\n";
-        return;
+        return false;
     }
 
     db.clear();
@@ -36,4 +36,6 @@ void Snapshot::load(std::unordered_map<std::string,std::string> &db)
     }
 
     file.close();
+
+    return true;
 }

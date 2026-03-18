@@ -30,10 +30,10 @@ void StorageEngine::execute(const vector<string> &tokens, const string &rawComma
         WAL::write(rawCommand);
         db.set(key, value);
         if (tokens.size() == 5 && tokens[3] == "EX")
-    {
-        int seconds = stoi(tokens[4]);
-        db.setExpiry(key, seconds);
-    }
+        {
+            int seconds = stoi(tokens[4]);
+            db.setExpiry(key, seconds);
+        }
 
         cout << "OK\n";
     }
@@ -77,10 +77,9 @@ void StorageEngine::execute(const vector<string> &tokens, const string &rawComma
 
     else if (command == "LOAD")
     {
-        Snapshot::load(db.getAll());
-        cout << "Database loaded\n";
+        if (Snapshot::load(db.getAll()))
+            cout << "Database loaded\n";
     }
-
     else if (command == "KEYS")
     {
         auto &data = db.getAll();

@@ -12,8 +12,13 @@ void WAL::recover(Database &database)
 {
     std::ifstream log("logs/commands.log");
 
+    database.startRecovery();
+
     if (!log)
+    {
+        database.endRecovery();
         return;
+    }
 
     std::string line;
 
@@ -37,4 +42,6 @@ void WAL::recover(Database &database)
             database.del(key);
         }
     }
+
+    database.endRecovery();
 }
